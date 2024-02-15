@@ -12,8 +12,8 @@ namespace MobileApp
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class StartPAge2 : ContentPage
     {
-        List<ContentPage> pages = new List<ContentPage> { new EntryPage(), new TimePage(), new Box_view() , new DateTimePage(), new SlideStepper(),new Rgb(),new lumemm()};
-        List<string> texts = new List<string>() { "Ava entry leht", "Ava timer leht", "Ava Box View","DateTimePAge","SildeStepper", "Rgb","Lumememm" };
+        List<ContentPage> pages = new List<ContentPage> { new EntryPage(), new TimePage(), new Box_view() , new DateTimePage(), new SlideStepper(),new Rgb(),new lumemm(), new Frame_Page(),new Game()};
+        List<string> texts = new List<string>() { "Ava entry leht", "Ava timer leht", "Ava Box View","DateTimePAge","SildeStepper", "Rgb","Lumememm","Frame","Game" };
         StackLayout st;
         public StartPAge2()
         {
