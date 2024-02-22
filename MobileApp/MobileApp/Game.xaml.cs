@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,25 +16,23 @@ namespace MobileApp
     public partial class Game : ContentPage
     {
         List<Label> tapped = new List<Label>();
-        int counter=0;
+        List<Label> untapped = new List<Label>();
+        List<Label> untappedClone;
+        int counter = 0;
+        int gamescounter = 0;
         Grid grid;
-        Image image;
-        Label label;
-        Button btnbot, btnonline;
-        List<Label> X1 = new List<Label>();
-        List<Label> X2 = new List<Label>();
-        List<Label> X3 = new List<Label>();
-        List<Label> Y1 = new List<Label>();
-        List<Label> Y2 = new List<Label>();
-        List<Label> Y3 = new List<Label>();
+        Button btnbot, btnonline, rndbackgorund;
+        int gmmode = 0;
+        Random rnd;
+        Label lblinfo, whichturnlbl, howmanygames;
+
         public Game()
         {
             grid = new Grid
             {
-                BackgroundColor = Color.LightBlue,
+                BackgroundColor = Color.FromRgb(12, 123, 123),
                 HorizontalOptions = LayoutOptions.FillAndExpand,
                 VerticalOptions = LayoutOptions.FillAndExpand,
-
             };
             TapGestureRecognizer tap = new TapGestureRecognizer();
             tap.NumberOfTapsRequired = 1;
@@ -42,268 +41,248 @@ namespace MobileApp
             {
                 for (int ii = 0; ii < 3; ii++)
                 {
-                    grid.Children.Add(
-                        label = new Label
-                        {
-                            HorizontalOptions = LayoutOptions.FillAndExpand,
-                            VerticalOptions = LayoutOptions.FillAndExpand,
-                            Text = "emptyyyyyyyyyyyyyyyyyyy",
-                            BackgroundColor = Color.White
-                        }, i, ii
-                        );
+                    Label label = new Label
+                    {
+                        HorizontalOptions = LayoutOptions.FillAndExpand,
+                        VerticalOptions = LayoutOptions.FillAndExpand,
+                        Text = " ",
+                        FontSize = 50,
+                        BackgroundColor = Color.White,
+                        TextColor = Color.Black,
+
+                        HorizontalTextAlignment = TextAlignment.Center
+
+                    };
+                    untapped.Add(label);
                     label.GestureRecognizers.Add(tap);
+                    grid.Children.Add(label, i, ii);
                 }
             }
-            
+            untappedClone = new List<Label>(untapped);
+            lblinfo = new Label
+            {
+                Text = "Mängija vs mängija",
+                TextColor = Color.Black,
+                 FontFamily = "Bold, Lobster-Regular",
+                HorizontalTextAlignment = TextAlignment.Center,
+                FontSize = 18
+            };
+            whichturnlbl = new Label
+            {
+                TextColor = Color.Black,
+                FontFamily = "Bold, Lobster-Regular",
+                HorizontalTextAlignment = TextAlignment.Center,
+                FontSize = 18
+            };
             btnbot = new Button
             {
-                Text= "Play vs bot" 
+                Text = "Mängi vs bot"
             };
             btnonline = new Button
             {
-                Text = "Play vs player"
+                Text = "Mängi vs mängija"
             };
-            grid.Children.Add(btnonline, 0, 4);
-            grid.Children.Add(btnbot, 1, 4);
+            rndbackgorund = new Button
+            {
+                Text = "Määra juhuslik värv"
+            };
+            howmanygames = new Label
+            {
+                Text = $"Sa mängisid {gamescounter} mänge",
+                TextColor = Color.Black,
+                FontFamily = "Bold, Lobster-Regular",
+                HorizontalTextAlignment = TextAlignment.Center,
+                FontSize = 18
+            };
+            btnbot.Clicked += Btnbot_Clicked;
+            btnonline.Clicked += Btnonline_Clicked;
+            rndbackgorund.Clicked += Rndbackgorund_Clicked;
+            grid.Children.Add(lblinfo, 1, 4);
+            grid.Children.Add(whichturnlbl, 0, 4);
+            grid.Children.Add(howmanygames, 2, 4);
+            grid.Children.Add(btnonline, 0, 5);
+            grid.Children.Add(btnbot, 1, 5);
+            grid.Children.Add(rndbackgorund, 2, 5);
             Content = grid;
+        }
+
+
+        private void Rndbackgorund_Clicked(object sender, EventArgs e)
+        {
+            rnd = new Random();
+            int ar = rnd.Next(0, 255);
+            int ag = rnd.Next(0, 255);
+            int ab = rnd.Next(0, 255);
+            grid.BackgroundColor = Color.FromRgb(ar, ag, ab);
+        }
+
+
+        private void Whichcturn()
+        {
+            if (counter % 2 == 0)
+            {
+                whichturnlbl.Text = "Nüüd " + "X " + " pöörake";
+            }
+            else
+            {
+                whichturnlbl.Text = "Nüüd " + "0" + " pöörake";
+            }
+        }
+        private void Btnonline_Clicked(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                for (int ii = 0; ii < 3; ii++)
+                {
+                    GetLabel(i, ii).Text = " ";
+                }
+            }
+            gmmode = 0;
+            counter = 0;
+            gamescounter++;
+            lblinfo.Text = "Mängija vs Mängija ";
+            whichturnlbl.Text = "Nüüd X omakorda";
+            untapped = new List<Label>(untappedClone);
+            howmanygames.Text = $"Sa mängisid {gamescounter} mänge";
+        }
+
+        private void Btnbot_Clicked(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                for (int ii = 0; ii < 3; ii++)
+                {
+                    GetLabel(i, ii).Text = " ";
+                }
+            }
+            gmmode = 1;
+            counter = 0;
+            gamescounter++;
+            lblinfo.Text = "Mängija vs bot ";
+            whichturnlbl.Text = "Nüüd X omakorda";
+            untapped = new List<Label>(untappedClone);
+            howmanygames.Text = $"Sa mängisid {gamescounter} mänge";
         }
 
         private void Tap_Tapped1(object sender, EventArgs e)
         {
-            
+            rnd = new Random();
             Label fr = (Label)sender;
             int r = Grid.GetRow(fr); int c = Grid.GetColumn(fr);
-            if (counter % 2==0)
+            if (gmmode == 0)
             {
-                if (Grid.GetRow(fr) == r && Grid.GetColumn(fr) == c && fr.Text!="X" && fr.Text != "0")
+                if (counter % 2 == 0)
                 {
-                    fr.Text = "X";
-                    fr.FontSize = 34;
-                    counter++;
-                    tapped.Add(fr);
-                    
+                    if (fr.Text == " ")
+                    {
+                        fr.Text = "X";
+                        counter++;
+                        tapped.Add(fr);
+                        untapped.Remove(fr);
+                    }
+                }
+                else
+                {
+                    if (fr.Text == " ")
+                    {
+                        fr.Text = "O";
+                        counter++;
+                        tapped.Add(fr);
+                        untapped.Remove(fr);
+                    }
                 }
             }
-            else
+            if (gmmode == 1)
             {
-                if (Grid.GetRow(fr) == r && Grid.GetColumn(fr) == c && fr.Text != "X" && fr.Text != "0")
+                if (counter % 2 == 0)
                 {
-                    fr.Text = "0";
-                    fr.FontSize = 34;
-                    counter++;
-                    tapped.Add(fr);
+                    if (fr.Text == " ")
+                    {
+                        fr.Text = "X";
+                        counter++;
+                        tapped.Add(fr);
+                        untapped.Remove(fr);
+                    }
+                    Botstep();
                 }
             }
-            int i = 0;
+            Whichcturn();
+            Checkwin();
+        }
 
-            X1.Clear();
-            X2.Clear();
-            X3.Clear();
-            Y1.Clear();
-            Y2.Clear();
-            Y3.Clear();
-            foreach (Label item in tapped)
+        private void Checkwin()
+        {
+            foreach (var winCondition in Winconditions())
             {
-                if (Grid.GetRow(fr) == 0)
+                bool xWins = true;
+                bool oWins = true;
+                foreach (var label in winCondition)
                 {
-                    X1.Add(fr);
-                    btnonline.Text = X1.Count.ToString();
-                    if (X1.Count==3)
-                    {
-                        int cnt = 0;
-                        int cnt2 = 0;
-                        foreach (Label item1 in X1)
-                        {
-                            if (item1.Text=="X")
-                            {
-                                cnt += 1;
-                            }
-                            else
-                            {
-                                cnt2+=1;
-                            }
-                            if (cnt==3)
-                            {
-                                btnonline.Text = "X Win"+ X1.Count.ToString(); 
-                            }
-                            else if (cnt2==3)
-                            {
-                                btnonline.Text = "0 Win"+X1.Count.ToString(); ;
-                            }
-                            else
-                            {
-                                    
-                            }
-                        }
-                    }
+                    if (label.Text != "X")
+                        xWins = false;
+                    if (label.Text != "O")
+                        oWins = false;
                 }
-                else if (Grid.GetRow(fr) == 1)
-                {
-                    X2.Add(fr);
-                    if (X2.Count == 3)
-                    {
-                        int cnt = 0;
-                        int cnt2 = 0;
-                        foreach (Label item1 in X2)
-                        {
-                            if (item1.Text == "X")
-                            {
-                                cnt += 1;
-                            }
-                            else
-                            {
-                                cnt2 += 1;
-                            }
-                            if (cnt == 3)
-                            {
-                                btnonline.Text = "X Win";
-                            }
-                            else if (cnt2 == 3)
-                            {
-                                btnonline.Text = "0 Win";
-                            }
-                            else
-                            {
 
-                            }
-                        }
-                    }
-                }
-                else if (Grid.GetRow(fr) == 2)
+                if (xWins)
                 {
-                    X3.Add(fr);
-                    if (X3.Count == 3)
-                    {
-                        int cnt = 0;
-                        int cnt2 = 0;
-                        foreach (Label item1 in X3)
-                        {
-                            if (item1.Text == "X")
-                            {
-                                cnt += 1;
-                            }
-                            else
-                            {
-                                cnt2 += 1;
-                            }
-                            if (cnt == 3)
-                            {
-                                btnonline.Text = "X Win";
-                            }
-                            else if (cnt2 == 3)
-                            {
-                                btnonline.Text = "0 Win";
-                            }
-                            else
-                            {
-
-                            }
-                        }
-                    }
+                    DisplayAlert("X Võidab", "Kui soovite mängu taaskäivitamist, klõpsake mis tahes nupule", "OK");
+                    break;
                 }
-                else if (Grid.GetColumn(fr) == 0)
+                if (oWins)
                 {
-                    Y1.Add(fr);
-                    if (Y1.Count == 3)
-                    {
-                        int cnt = 0;
-                        int cnt2 = 0;
-                        foreach (Label item1 in Y1)
-                        {
-                            if (item1.Text == "X")
-                            {
-                                cnt += 1;
-                            }
-                            else
-                            {
-                                cnt2 += 1;
-                            }
-                            if (cnt == 3)
-                            {
-                                btnonline.Text = "X Win";
-                            }
-                            else if (cnt2 == 3)
-                            {
-                                btnonline.Text = "0 Win";
-                            }
-                            else
-                            {
-
-                            }
-                        }
-                    }
+                    DisplayAlert("O Võidab", "Kui soovite mängu taaskäivitamist, klõpsake mis tahes nupule", "OK");
+                    break;
                 }
-                else if (Grid.GetColumn(fr) == 1)
+                if (counter == 9)
                 {
-                    Y2.Add(fr);
-                    if (Y2.Count == 3)
-                    {
-                        int cnt = 0;
-                        int cnt2 = 0;
-                        foreach (Label item1 in Y2)
-                        {
-                            if (item1.Text == "X")
-                            {
-                                cnt += 1;
-                            }
-                            else
-                            {
-                                cnt2 += 1;
-                            }
-                            if (cnt == 3)
-                            {
-                                btnonline.Text = "X Win";
-                            }
-                            else if (cnt2 == 3)
-                            {
-                                btnonline.Text = "0 Win";
-                            }
-                            else
-                            {
-
-                            }
-                        }
-                    }
+                    DisplayAlert("Viik", "Kui soovite mängu taaskäivitamist, klõpsake mis tahes nupule", "OK");
+                    break;
                 }
-                else if (Grid.GetColumn(fr) == 2)
-                {
-                    Y3.Add(fr);
-                    if (Y3.Count == 3)
-                    {
-                        int cnt = 0;
-                        int cnt2 = 0;
-                        foreach (Label item1 in Y3)
-                        {
-                            if (item1.Text == "X")
-                            {
-                                cnt += 1;
-                            }
-                            else
-                            {
-                                cnt2 += 1;
-                            }
-                            if (cnt == 3)
-                            {
-                                btnonline.Text = "X Win";
-                            }
-                            else if (cnt2 == 3)
-                            {
-                                btnonline.Text = "0 Win";
-                            }
-                            else
-                            {
 
-                            }
-                        }
-                    }
-                }
-                else if(true)
-                {
-
-                }
             }
         }
 
-        
+        private List<List<Label>> Winconditions()
+        {
+            List<List<Label>> winConditions = new List<List<Label>>();
+
+
+            winConditions.Add(new List<Label> { GetLabel(0, 0), GetLabel(1, 0), GetLabel(2, 0) });
+            winConditions.Add(new List<Label> { GetLabel(0, 1), GetLabel(1, 1), GetLabel(2, 1) });
+            winConditions.Add(new List<Label> { GetLabel(0, 2), GetLabel(1, 2), GetLabel(2, 2) });
+
+
+            winConditions.Add(new List<Label> { GetLabel(0, 0), GetLabel(0, 1), GetLabel(0, 2) });
+            winConditions.Add(new List<Label> { GetLabel(1, 0), GetLabel(1, 1), GetLabel(1, 2) });
+            winConditions.Add(new List<Label> { GetLabel(2, 0), GetLabel(2, 1), GetLabel(2, 2) });
+
+            winConditions.Add(new List<Label> { GetLabel(0, 0), GetLabel(1, 1), GetLabel(2, 2) });
+            winConditions.Add(new List<Label> { GetLabel(0, 2), GetLabel(1, 1), GetLabel(2, 0) });
+
+            return winConditions;
+        }
+
+        private Label GetLabel(int row, int column)
+        {
+            foreach (var child in grid.Children)
+            {
+                if (Grid.GetRow(child) == row && Grid.GetColumn(child) == column)
+                    return (Label)child;
+            }
+            return null;
+        }
+        private void Botstep()
+        {
+            rnd = new Random();
+            int rndint = untapped.Count+1;
+            int rnd_element = rnd.Next(rndint);
+            Label label = untapped[rnd_element];
+            label.Text = "O";
+            counter++;
+            tapped.Add(untapped[rnd_element]);
+            untapped.Remove(untapped[rnd_element]);
+        }
+
     }
 }
