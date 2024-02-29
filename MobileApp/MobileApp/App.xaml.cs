@@ -8,7 +8,6 @@ namespace MobileApp
     {
         public App()
         {
-            InitializeComponent();
 
             MainPage = new NavigationPage(new StartPAge2());
         }
