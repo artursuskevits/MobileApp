@@ -112,8 +112,8 @@ namespace MobileApp
         {
             string newfavorite=webview.Source.ToString();
             lehed.Add(newfavorite);
-            string result = await DisplayPromptAsync("Vali uus nimi", "Ok");
-            nimitused.Add(newfavorite);
+            string result = await DisplayPromptAsync("Vali uus nimi", "Uus nimi");
+            nimitused.Add(result);
         }
 
         private void Historybtn_Clicked(object sender, EventArgs e)
