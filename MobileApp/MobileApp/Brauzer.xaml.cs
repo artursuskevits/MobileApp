@@ -16,51 +16,72 @@ namespace MobileApp
     public partial class Brauzer : ContentPage
     {
         List<string> lehed = new List<string> { "https://www.instagram.com/thousand.cursed.enemies/", "https://thousand-cursed-enemies.com/en", "https://genius.com/Rewwqq-thousand-cursed-enemies-lyrics", "https://www.invokergame.com/" };
-        new List<string> nimitused = new List<string> { "Cursed Inst", "Cursed Merch", "Amazing Song", "Invoker Game" };
+        List<string> nimitused = new List<string> { "Cursed Inst", "Cursed Merch", "Amazing Song", "Invoker Game" };
         Xamarin.Forms.Entry entry;
-        Button backbtn, homebtn, openbtn, historybtn,favoritesbtn;
+        ImageButton backbtn, homebtn, openbtn, historybtn,favoritesbtn;
         Xamarin.Forms.Picker picker;
         WebView webview;
+        string result = "";
         string HomePage = "https://www.tthk.ee";
         string Lastpage = "https://www.tthk.ee";
-        new List<string> lastpages = new List<string> { "0", "https://www.tthk.ee" };
-        new List<string> history = new List<string> {  "https://www.tthk.ee" };
+         List<string> lastpages = new List<string> { "0", "https://www.tthk.ee" };
+         List<string> history = new List<string> {  "https://www.tthk.ee" };
     public Brauzer()
         {
             this.BackgroundColor = Color.FromRgb(255, 255, 255);
-            favoritesbtn = new Button()
+            favoritesbtn = new ImageButton()
             {
                 WidthRequest = 200,
-                HeightRequest = 50
+                HeightRequest = 100,
+                BackgroundColor = this.BackgroundColor,
+                HorizontalOptions = LayoutOptions.Center,
+                    VerticalOptions = LayoutOptions.CenterAndExpand
             };
-            favoritesbtn.Text = "Lemmik";
-            openbtn = new Button()
+            favoritesbtn.Source = "favorite.png";
+            openbtn = new ImageButton()
             {
                 WidthRequest = 200,
-                HeightRequest = 50
-            };
-            openbtn.Text = "Open messanger";
+                HeightRequest = 100,
+                BackgroundColor=this.BackgroundColor,
 
-            backbtn = new Button()
-            {
-                WidthRequest = 200,
-                HeightRequest = 50
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.CenterAndExpand
             };
-            backbtn.Text = "Back";
+       
+            openbtn.Source = "messanger.png";
 
-            homebtn = new Button()
+            backbtn = new ImageButton()
             {
                 WidthRequest = 200,
-                HeightRequest = 50
-            };
-            homebtn.Text = "Home";
+                HeightRequest = 100,
+                BackgroundColor = this.BackgroundColor,
 
-            historybtn = new Button()
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.CenterAndExpand
+            };
+            backbtn.Source = "back.png";
+
+            homebtn = new ImageButton()
             {
                 WidthRequest = 200,
-                HeightRequest = 50
+                HeightRequest = 100,
+                BackgroundColor = this.BackgroundColor,
+
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.CenterAndExpand
             };
-            homebtn.Text = "History";
+            homebtn.Source = "home.png";
+
+            historybtn = new ImageButton()
+            {
+                WidthRequest = 200,
+                HeightRequest = 100,
+                BackgroundColor = this.BackgroundColor,
+
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.CenterAndExpand
+            };
+            historybtn.Source = "history.png";
 
             entry = new Xamarin.Forms.Entry()
             {
@@ -110,11 +131,23 @@ namespace MobileApp
 
         private async void Favoritesbtn_Clicked(object sender, EventArgs e)
         {
-            string newfavorite=webview.Source.ToString();
-            lehed.Add(newfavorite);
-            string result = await DisplayPromptAsync("Vali uus nimi", "Uus nimi");
-            nimitused.Add(result);
+            if (webview.Source is UrlWebViewSource urlWebViewSource)
+            {
+                string currentUrl = urlWebViewSource.Url;
+
+                lehed.Add(currentUrl);
+
+                result = await DisplayPromptAsync("Vali uus nimi", "Uus nimi");
+                nimitused.Add(result);
+                picker.ItemsSource = null;
+                picker.ItemsSource = nimitused;
+            }
+            else
+            {
+                await DisplayAlert("Error", "The current source is not a URL", "OK");
+            }
         }
+
 
         private void Historybtn_Clicked(object sender, EventArgs e)
         {
@@ -154,13 +187,11 @@ namespace MobileApp
             string url = "https://" + entry.Text;
             DisplayAlert("Navigation", $"Opening {url}", "OK");
             webview.Source = new UrlWebViewSource { Url = url };
-            lehed.Add(url);
-            nimitused.Add(url);
             Lastpage = url;
             history.Add(Lastpage);
             lastpages[0] = lastpages[1];
             lastpages[1] = Lastpage;
-            picker.ItemsSource = nimitused; ;
+            
 
         }
 
