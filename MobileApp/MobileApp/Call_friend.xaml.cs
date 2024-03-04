@@ -17,7 +17,7 @@ namespace MobileApp
         SwitchCell sc;
         ImageCell ic;
         TableSection fotosection;
-        EntryCell tel_nr_email,texte,textn,text;
+        EntryCell tel_nr,email,textn,text;
 
         public Call_friend()
         {
@@ -26,25 +26,26 @@ namespace MobileApp
             ic = new ImageCell
             {
                 ImageSource = ImageSource.FromFile("urod.jpg"),
-                Text = "FotoNimetus",
-                Detail = "Foto Kirjeldus"
+                Text = "Minu Sober",
+                Detail = "Vaga ilus pois"
             };
-            tel_nr_email = new EntryCell()
+            tel_nr= new EntryCell()
             {
-                Label = "Nimi",
-                Placeholder = "Sisesta sõbraga nimi",
-                Keyboard = Keyboard.Default,
+                Label = "Telefon",
+                Placeholder = "Sisesta tel. number",
+                Keyboard = Keyboard.Telephone
             };
-            textn = new EntryCell()
+            email = new EntryCell()
             {
-                Label = "Sõnum",
-                Placeholder = "Sisesta sõnum",
-                Keyboard = Keyboard.Default,
+                Label = "Email",
+                Placeholder = "Sisesta email",
+                Keyboard = Keyboard.Email
+
             };
-            texte = new EntryCell()
+            text = new EntryCell()
             {
-                Label = "Sõnum",
-                Placeholder = "Sisesta sõnum",
+                Label = "Plaun kirjuta text",
+                Placeholder = "Sisesta text",
                 Keyboard = Keyboard.Default,
             };
             fotosection = new TableSection();
@@ -55,22 +56,12 @@ namespace MobileApp
                 {
                     new TableSection("Põhiandmed: ")
                     {
-                        tel_nr_email
+                        text
                     },
                     new TableSection("Kontaktiandmed: ")
                     {
-                        new EntryCell
-                        {
-                            Label = "Telefon",
-                            Placeholder= "Sisesta tel. number",
-                            Keyboard=Keyboard.Telephone
-                        },
-                        new EntryCell
-                        {
-                            Label = "Email",
-                            Placeholder= "Sisesta email",
-                            Keyboard=Keyboard.Email
-                        },
+                        tel_nr,
+                        email,
                         sc
                     },
                     fotosection
@@ -124,7 +115,7 @@ namespace MobileApp
             var sms = CrossMessaging.Current.SmsMessenger;
             if (sms.CanSendSms)
             {
-                sms.SendSms(tel_nr_email.Text, textn.Text);
+                sms.SendSms(tel_nr.Text, text.Text);
             }
         }
 
@@ -133,7 +124,7 @@ namespace MobileApp
             var call = CrossMessaging.Current.PhoneDialer;
             if (call.CanMakePhoneCall)
             {
-                call.MakePhoneCall(tel_nr_email.Text);
+                call.MakePhoneCall(tel_nr.Text);
             }
         }
 
@@ -142,7 +133,7 @@ namespace MobileApp
             var mail = CrossMessaging.Current.EmailMessenger;
             if (mail.CanSendEmail)
             {
-                mail.SendEmail(tel_nr_email.Text, "Tervitus!", text.Text);
+                mail.SendEmail(email.Text, "Tervitus!", text.Text);
             }
         }
     }
