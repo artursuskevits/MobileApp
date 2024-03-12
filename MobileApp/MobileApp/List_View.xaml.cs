@@ -38,6 +38,7 @@ namespace MobileApp
                 ItemsSource = telefons,
                 ItemTemplate = new DataTemplate(() =>
                 {
+                    
                     Label nimetus = new Label { FontSize = 20 };
                     nimetus.SetBinding(Label.TextProperty, "Nimetus");
                     Label tootja = new Label();
