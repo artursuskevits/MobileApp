@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,52 +14,92 @@ namespace MobileApp
 
     public partial class List_View : ContentPage
     {
-        public List<Telefon> telefons { get; set; }
+        public ObservableCollection<Telefon> telefons { get; set; }
+        public ObservableCollection<Ruhm<string, Telefon>> telefonideruhmades { get; set; }
         Label lbl_list;
         ListView list;
-
+        Button lisa, kustuta;
 
         public List_View()
         {
-            telefons = new List<Telefon>
+            lisa = new Button { Text = "Lisa felefon" };
+            kustuta = new Button { Text = "Kustuta telefn" };
+            telefons = new ObservableCollection<Telefon>
                 {
-                new Telefon { Nimetus = "Samsung Galaxy S22 Ultra", Tootja = "Samsung", Hind = 1349 },
-                new Telefon { Nimetus = "Xiaomi Mi 11 Lite 5G NE", Tootja = "Xiaomi", Hind = 399 },
-                new Telefon { Nimetus = "Xiaomi Mi 11 Lite 5G", Tootja = "Xiaomi", Hind = 339 },
-                new Telefon { Nimetus = "iPhone 13", Tootja = "Apple", Hind = 1179 }
+                new Telefon { Nimetus = "Samsung Galaxy S22 Ultra", Tootja = "Samsung", Hind = 1349, Pilt="telefon.png"},
+                new Telefon { Nimetus = "Xiaomi Mi 11 Lite 5G NE", Tootja = "Xiaomi", Hind = 399, Pilt="telefon.png" },
+                new Telefon { Nimetus = "Xiaomi Mi 11 Lite 5G", Tootja = "Xiaomi", Hind = 339 , Pilt="telefon.png"},
+                new Telefon { Nimetus = "iPhone 13", Tootja = "Apple", Hind = 1179 , Pilt = "telefon.png"}
                 };
+            var ruhmad = telefons.GroupBy(p => p.Tootja)
+                         .Select(g => new Ruhm<string, Telefon>(g.Key, g));
+            telefonideruhmades = new ObservableCollection<Ruhm<string, Telefon>>(ruhmad);
             lbl_list = new Label
             {
                 HorizontalOptions = LayoutOptions.Center,
                 Text = "Telefonid loetelu",
                 FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label))
             };
-            list = new ListView {
+            list = new ListView
+            {
+                SeparatorColor = Color.Orange,
+                Header = "Telefonid rühmades",
+                Footer = DateTime.Now.ToString("T"),
                 HasUnevenRows = true,
-                ItemsSource = telefons,
-                ItemTemplate = new DataTemplate(() =>
+                ItemsSource = telefonideruhmades,
+                IsGroupingEnabled = true,
+                //ItemsSource =telefons,
+                GroupHeaderTemplate = new DataTemplate(() =>
                 {
-                    
-                    Label nimetus = new Label { FontSize = 20 };
-                    nimetus.SetBinding(Label.TextProperty, "Nimetus");
                     Label tootja = new Label();
-                    tootja.SetBinding(Label.TextProperty, "Tootja");
-                    Label hind = new Label();
-                    hind.SetBinding(Label.TextProperty, "Bind");
+                    tootja.SetBinding(Label.TextProperty, "Nimetus");
                     return new ViewCell
                     {
                         View = new StackLayout
                         {
                             Padding = new Thickness(0, 5),
                             Orientation = StackOrientation.Vertical,
-                            Children = { nimetus, tootja, hind }
+                            Children = { tootja }
+                        }
+                    };
+                }),
+                ItemTemplate = new DataTemplate(() =>
+                {
+                    Label nimetus = new Label { FontSize = 20 };
+                    nimetus.SetBinding(Label.TextProperty, "Nimetus");
+                    Label hind = new Label();
+                    hind.SetBinding(Label.TextProperty, "Hind");
+                    return new ViewCell
+                    {
+                        View = new StackLayout
+                        {
+                            Padding = new Thickness(0, 5),
+                            Orientation = StackOrientation.Vertical,
+                            Children = { nimetus, hind }
                         }
                     };
                 })
             };
-            list.ItemTapped += List_ItemTapped;
-            this.Content = new StackLayout { Children = { lbl_list, list } };
 
+list.ItemTapped += List_ItemTapped;
+            lisa.Clicked += Lisa_Clicked;
+            kustuta.Clicked += Kustuta_Clicked;
+            this.Content = new StackLayout { Children = { lbl_list, list,lisa,kustuta} };
+
+        }
+
+        private void Kustuta_Clicked(object sender, EventArgs e)
+        {
+            Telefon phone = list.SelectedItem as Telefon;
+            
+                telefons.Remove(phone);
+                list.SelectedItem = null;
+            
+        }
+
+        private void Lisa_Clicked(object sender, EventArgs e)
+        {
+            telefons.Add(new Telefon { Nimetus = "Uus telefon", Tootja = "Uus tootja", Hind = 1 });
         }
 
         private async void List_ItemTapped(object sender, ItemTappedEventArgs e)
