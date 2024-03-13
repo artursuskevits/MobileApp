@@ -19,7 +19,7 @@ namespace MobileApp
         Label lbl_list;
         ListView list;
         Button lisa, kustuta;
-
+        Telefon selectedPhone;
         public List_View()
         {
             lisa = new Button { Text = "Lisa felefon" };
@@ -90,24 +90,31 @@ list.ItemTapped += List_ItemTapped;
 
         private void Kustuta_Clicked(object sender, EventArgs e)
         {
-            Telefon phone = list.SelectedItem as Telefon;
-            
-                telefons.Remove(phone);
-                list.SelectedItem = null;
-            
+            telefons.Remove(selectedPhone);
+            var ruhmad = telefons.GroupBy(p => p.Tootja)
+                         .Select(g => new Ruhm<string, Telefon>(g.Key, g));
+            telefonideruhmades = new ObservableCollection<Ruhm<string, Telefon>>(ruhmad);
+            list.ItemsSource = null;
+            list.ItemsSource = telefonideruhmades;
         }
 
         private void Lisa_Clicked(object sender, EventArgs e)
         {
             telefons.Add(new Telefon { Nimetus = "Uus telefon", Tootja = "Uus tootja", Hind = 1 });
+            var ruhmad = telefons.GroupBy(p => p.Tootja)
+                         .Select(g => new Ruhm<string, Telefon>(g.Key, g));
+            telefonideruhmades = new ObservableCollection<Ruhm<string, Telefon>>(ruhmad);
+            list.ItemsSource = null;
+            list.ItemsSource = telefonideruhmades;
         }
 
         private async void List_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            Telefon selectedPhone = e.Item as Telefon;
+
+            selectedPhone= e.Item as Telefon;
             if (selectedPhone!=null)
             {
-                await DisplayAlert("See on", $"{selectedPhone.Tootja} - {selectedPhone.Nimetus} ","Ok");
+                await DisplayAlert("See on", $"{selectedPhone.Tootja} | {selectedPhone.Nimetus} - {selectedPhone.Hind} eurot","Ok");
             }
         }
     }
