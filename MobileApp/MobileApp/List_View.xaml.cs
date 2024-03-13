@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -26,10 +26,10 @@ namespace MobileApp
             kustuta = new Button { Text = "Kustuta telefn" };
             telefons = new ObservableCollection<Telefon>
                 {
-                new Telefon { Nimetus = "Samsung Galaxy S22 Ultra", Tootja = "Samsung", Hind = 1349, Pilt="telefon.png"},
-                new Telefon { Nimetus = "Xiaomi Mi 11 Lite 5G NE", Tootja = "Xiaomi", Hind = 399, Pilt="telefon.png" },
-                new Telefon { Nimetus = "Xiaomi Mi 11 Lite 5G", Tootja = "Xiaomi", Hind = 339 , Pilt="telefon.png"},
-                new Telefon { Nimetus = "iPhone 13", Tootja = "Apple", Hind = 1179 , Pilt = "telefon.png"}
+                new Telefon { Nimetus = "Samsung Galaxy S22 Ultra", Tootja = "Samsung", Hind = 1349, Pilt="SamsungGalaxy.jpg"},
+                new Telefon { Nimetus = "Xiaomi Mi 11 Lite 5G NE", Tootja = "Xiaomi", Hind = 399, Pilt="XiamaiMi11Lite5GNE.jpg" },
+                new Telefon { Nimetus = "Xiaomi Mi 11 Lite 5G", Tootja = "Xiaomi", Hind = 339 , Pilt="XiaomiMi11Lite5G.jpg"},
+                new Telefon { Nimetus = "iPhone 13", Tootja = "Apple", Hind = 1179 , Pilt = "Iphone13.jpg"}
                 };
             var ruhmad = telefons.GroupBy(p => p.Tootja)
                          .Select(g => new Ruhm<string, Telefon>(g.Key, g));
@@ -51,6 +51,7 @@ namespace MobileApp
                 //ItemsSource =telefons,
                 GroupHeaderTemplate = new DataTemplate(() =>
                 {
+                  
                     Label tootja = new Label();
                     tootja.SetBinding(Label.TextProperty, "Nimetus");
                     return new ViewCell
@@ -65,17 +66,23 @@ namespace MobileApp
                 }),
                 ItemTemplate = new DataTemplate(() =>
                 {
+                    Image img = new Image() { WidthRequest =100,
+                    HeightRequest=100};
+                    img.SetBinding(Image.SourceProperty, "Pilt");
                     Label nimetus = new Label { FontSize = 20 };
                     nimetus.SetBinding(Label.TextProperty, "Nimetus");
                     Label hind = new Label();
                     hind.SetBinding(Label.TextProperty, "Hind");
+                    
+
+
                     return new ViewCell
                     {
                         View = new StackLayout
                         {
                             Padding = new Thickness(0, 5),
-                            Orientation = StackOrientation.Vertical,
-                            Children = { nimetus, hind }
+                            Orientation = StackOrientation.Horizontal,
+                            Children = { img,nimetus, hind }
                         }
                     };
                 })
@@ -98,14 +105,31 @@ list.ItemTapped += List_ItemTapped;
             list.ItemsSource = telefonideruhmades;
         }
 
-        private void Lisa_Clicked(object sender, EventArgs e)
+        private async void Lisa_Clicked(object sender, EventArgs e)
         {
-            telefons.Add(new Telefon { Nimetus = "Uus telefon", Tootja = "Uus tootja", Hind = 1 });
-            var ruhmad = telefons.GroupBy(p => p.Tootja)
-                         .Select(g => new Ruhm<string, Telefon>(g.Key, g));
-            telefonideruhmades = new ObservableCollection<Ruhm<string, Telefon>>(ruhmad);
-            list.ItemsSource = null;
-            list.ItemsSource = telefonideruhmades;
+            int X = 0;
+            string Tootja = await DisplayPromptAsync("Vali uus Tootja", "Uus Tootja");
+            string Mudel = await DisplayPromptAsync("Vali uus Mudel", "Uus Mudel");
+            string Hind= await DisplayPromptAsync("Vali uus Hind", "Uus Hind");
+            if (Tootja!="" && Mudel != "" && Hind != "" && Tootja != null && Mudel != null && Hind != null && Int32.TryParse(Hind, out int hindValue) )
+            {
+                try
+                {
+                    var photo = await MediaPicker.PickPhotoAsync();
+                    ImageSource vlad = ImageSource.FromFile(photo.FullPath);
+                    telefons.Add(new Telefon { Nimetus = Mudel, Tootja = Tootja, Hind = Int32.Parse(Hind), Pilt = vlad });
+                    var ruhmad = telefons.GroupBy(p => p.Tootja)
+                                 .Select(g => new Ruhm<string, Telefon>(g.Key, g));
+                    telefonideruhmades = new ObservableCollection<Ruhm<string, Telefon>>(ruhmad);
+                    list.ItemsSource = null;
+                    list.ItemsSource = telefonideruhmades;
+                }
+                catch (Exception)
+                {
+                }
+                
+            }
+            
         }
 
         private async void List_ItemTapped(object sender, ItemTappedEventArgs e)
