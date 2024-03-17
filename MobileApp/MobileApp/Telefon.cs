@@ -5,6 +5,7 @@ using Xamarin.Forms;
 
 namespace MobileApp
 {
+
    public class Telefon
     {
         public string Nimetus { get; set; }
