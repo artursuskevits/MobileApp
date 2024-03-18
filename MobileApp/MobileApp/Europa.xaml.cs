@@ -44,7 +44,7 @@ namespace MobileApp
             lbl_list = new Label
             {
                 HorizontalOptions = LayoutOptions.Center,
-                Text = "Europa CRiigid",
+                Text = "Europa Riigid",
                 FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label))
             };
             list = new ListView
@@ -106,7 +106,7 @@ namespace MobileApp
         }
         private void Kustuta_Clicked(object sender, EventArgs e)
         {
-            Allcountrys.Add(selectedCountry.Nimi);
+            Allcountrys.Remove(selectedCountry.Nimi);
             countrys.Remove(selectedCountry);
             var ruhmad = countrys.GroupBy(p => p.FirstLetter)
                          .Select(g => new Ruhm<string, Country>(g.Key, g));
@@ -119,7 +119,13 @@ namespace MobileApp
         {
             int X = 0;
             string Nimi = await DisplayPromptAsync("Vali uus Nimi ", "Uus Nimi ");
-            string Pealinn = await DisplayPromptAsync("Vali uus Palinn", "Uus Palinn");
+            if (Allcountrys.Contains(Nimi))
+            {
+
+            }
+            else
+            {
+                string Pealinn = await DisplayPromptAsync("Vali uus Pealinn", "Uus Pealinn");
             string Rahvaarv = await DisplayPromptAsync("Vali uus Rahvaarv", "Uus Rahvaarv");
             if (Nimi != "" && Pealinn!= "" && Rahvaarv != "" && Nimi != null && Pealinn != null && Rahvaarv != null && Int32.TryParse(Rahvaarv, out int hindValue))
             {
@@ -128,19 +134,15 @@ namespace MobileApp
                     var photo = await MediaPicker.PickPhotoAsync();
                     ImageSource vlad = ImageSource.FromFile(photo.FullPath);
                     var firstLetter = Nimi[0].ToString();
-                    if (Allcountrys.Contains(Nimi))
-                    {
-                       
-                    }
-                    else
-                    {
+                    
+                    
                         countrys.Add(new Country { Pealinn = Pealinn, Nimi = Nimi, Rahvaarv = Int32.Parse(Rahvaarv), Flag = vlad, FirstLetter = firstLetter });
                         var ruhmad = countrys.GroupBy(p => p.FirstLetter)
                                      .Select(g => new Ruhm<string, Country>(g.Key, g));
                         Countryruhmades = new ObservableCollection<Ruhm<string, Country>>(ruhmad);
                         list.ItemsSource = null;
                         list.ItemsSource = Countryruhmades;
-                    }
+                    
                     
                 }
                 catch (Exception)
@@ -148,7 +150,7 @@ namespace MobileApp
                 }
 
             }
-
+            }
         }
 
         private async void List_ItemTapped(object sender, ItemTappedEventArgs e)
